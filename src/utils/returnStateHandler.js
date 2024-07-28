@@ -1,23 +1,18 @@
 const HTTP_CODES = require("http-codes");
-const { ErrorResponse } = require("./ErrorResponse");
 const utils = require("./utils");
 
 const returnStateHandler = async function (returnState, req, res, next) {
+  console.log(5, returnState)
   try {
-    const { success } = returnState;
-    if (success) {
+    if (returnState.success) {
       const body = utils.removeEmptyValueFromObject(returnState);
       return res.status(HTTP_CODES.OK).send(body);
     }
-    if (returnState?.error?.message) { 
-      returnState.error.message2 = returnState.error.message; 
-    }
     // TODO Replace with App Error codes and error messages...
-    return res.status(returnState.status).send(returnState);
+    return res.status(returnState.status).send(returnState?.error?.message);
   } catch (error) {
     console.log("Caught error. Sending error also now", error);
-    const errResponse = new ErrorResponse(returnStateHandler.status, "Interval Server Error", false);
-    next (errResponse);
+    return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send(err.message)
   }
 };
 

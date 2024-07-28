@@ -48,14 +48,6 @@ app.use(
 ////// END WEB SERVER INSTANTIATION AND CONFIGURATION SECTION //////
 
 try {
-  app.use((req, res, next) => {
-    res.header("Strict-Transport-Security", "max-age=63072000; includeSubdomains; preload");
-    res.header("X-XSS-Protection", "1; mode=block");
-    res.header("Cache-control", "no-store");
-    res.header("Pragma", "no-cache");
-    next();
-  });
-
   /// /// DATABASE CONNECTION //////
   const connect = async () => {
     try {
@@ -68,10 +60,26 @@ try {
 
   connect();
 
-  app.use("/", routes);
+  app.use((req, res, next) => {
+    res.header("Strict-Transport-Security", "max-age=63072000; includeSubdomains; preload");
+    res.header("X-XSS-Protection", "1; mode=block");
+    res.header("Cache-control", "no-store");
+    res.header("Pragma", "no-cache");
+    next();
+  });
+
+  app.use("/organization", routes.organizationRoute);
+  app.use("/", routes.router);
+
+  // NOT FOUND
+  app.use((req, res, next) => {
+    console.log(87)
+    next({ error: "ROUTE NOT FOUND", success: false, status: 401 });
+  }, returnStateHandler);
 
   // UNHANDLED EXCEPTIONS
   app.use((err, req, res, next) => {
+    console.log(76)
     logger.error("handling generic unhandled exceptions");
     logger.error(err);
     if (err) {
@@ -80,10 +88,6 @@ try {
     }
   }, returnStateHandler);
 
-  // NOT FOUND
-  app.use((req, res, next) => {
-    next({ error: "ROUTE NOT FOUND", success: false, status: 401 });
-  }, returnStateHandler);
 } catch (error) {
     logger.error("Unable to connect to the database:", error);
 }

@@ -1,12 +1,13 @@
 'use strict';
+const path = require('path');
 const express = require('express');
 const router = express.Router();
 const swaggerUi = require("swagger-ui-express");
-const path = require('path');
 
 const specs = require("../utils/swagger");
-const { returnStateHandler } = require("../utils/returnStateHandler");
-const { auth } = require("../middleware/auth");
+
+const organizationRoute = require('./organization');
+
 
 // Public routes (anonymous)
 router.get('/api', function (req, res) { res.status(200).send("ResFrac API"); });
@@ -15,11 +16,10 @@ router.get("/health", (req, res) => res.status(200).send("ResFrac API - OK"));
 router.use("/", express.static(path.join(__dirname, "../public"))); // added static html files in public folder to verify google registration
 router.get('/', function (req, res) { res.status(200).send("OK"); });
 
-// Secure Routes
-// app.use("/organization", auth, routes.RoleRoute);
 
 
-module.exports = router;
+
+module.exports = {router, organizationRoute};
 
 
 /**

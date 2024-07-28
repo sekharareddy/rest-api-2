@@ -25,7 +25,7 @@ if (process.env.SSL && process.env.SSL == 1){
     key: fs.readFileSync(path.resolve(__dirname, 'key.pem')),
     cert: fs.readFileSync(path.resolve(__dirname, 'cert.pem')),
     requestCert: true,
-    rejectUnauthorized: false
+    rejectUnauthorized: true
   };
   console.log('creating https server')
   server = https.createServer(options, app)
